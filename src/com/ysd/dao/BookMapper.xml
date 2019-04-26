@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ysd.dao.BookMapper">
+	<select id="SelectBookCount" parameterType="fenye" resultType="int">
+		select count(B_Id) from Book
+	</select>
+	<resultMap type="book" id="booklist">
+		<id column="B_Id" property="B_Id"/>
+	  	<result column="B_Name" property="B_Name"/>
+	  	<result column="B_Price" property="B_Price"/>
+	  	<result column="B_Author" property="B_Author"/>
+	  	<result column="B_Introduce" property="B_Introduce"/>
+	  	<result column="C_Id" property="booktype.C_Id"/>
+	  	<result column="C_Name" property="booktype.C_Name"/>
+	</resultMap>
+	<select id="SelectBookAll" parameterType="fenye" resultMap="booklist">
+		select  b.B_Id,b.B_Name,b.B_Price,b.B_Author,b.B_Introduce,t.C_Id,t.C_Name from book b,booktype t 
+		<where>
+			<if test="book.B_Name!=null and book.B_Name!=''">
+				and B_Name like "%"#{book.B_Name}"%"
+			</if>
+			<if test="book.KS_price!=null and book.KS_price!=''">
+				and B_Price &gt;=#{book.KS_price}
+			</if>
+			<if test="book.JS_price!=null and book.JS_price!=''">
+				and B_Price &lt;=#{book.JS_price}
+			</if>
+			<if test="book.C_Id!=null and book.C_Id!=''">
+				and b.C_Id=#{book.C_Id}
+			</if>
+			and b.C_Id=t.C_Id
+		</where>
+		limit #{page},#{pageSize}
+	</select>
+	<select id="SelectBookType" resultType="booktype">
+		select * from BookType
+	</select>
+	<update id="UpdateBook" parameterType="book">
+		update book set B_Name=#{B_Name},B_Price=#{B_Price},B_Author=#{B_Author},B_Introduce=#{B_Introduce},C_Id=#{C_Id} where  B_Id=#{B_Id}
+	</update>
+	<insert id="InsertBook" parameterType="book">
+		INSERT INTO book(B_Name,B_Price,B_Author,B_Introduce,C_Id)VALUES(#{B_Name},#{B_Price},#{B_Author},#{B_Introduce},#{C_Id})
+	</insert>
+	<delete id="DelBook" parameterType="int">
+		delete from book where B_Id=#{B_Id}
+	</delete>
+</mapper>
